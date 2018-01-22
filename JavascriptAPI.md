@@ -49,9 +49,7 @@ WebAssembly对象是在global对象上拥有初始化值的对象。跟`Math`和
 
 ## `WebAssembly`的对象的方法属性
 
-```
-WebAssembly.validate
-```
+### WebAssembly.validate
 
 `validate`方法的定义:
 
@@ -63,9 +61,8 @@ WebAssembly.validate
 
 除此之外，这个函数还会验证定义的[WebAssembly 规范](),当验证成功时，返回`true`,否则返回`false`
 
-```
-WebAssembly.compile
-```
+
+### WebAssembly.compile
 
 `compile`方法的定义：
 
@@ -81,9 +78,8 @@ WebAssembly.compile
 
 实际上，这个方法可以被扩展成stream流数据参数，从而实现异步的流编译。
 
-```
-WebAssembly.instantiate
-```
+
+### WebAssembly.instantiate
 
 这个方法是用于根据参数类型进行重载，如果重载以后的类型还是不匹配，怎返回`Proimse`的`rejected`,并在里面附带类型警报。
 
