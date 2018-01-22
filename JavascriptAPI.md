@@ -95,4 +95,48 @@ Promise<WebAssemblyInstantiatedSource>
 
 如果传递的参数不是`BufferSource`，那么`Promise`将会`rejected`类型错误信息。
 
+这个方法将启动一个异步的编辑`WebAssembly.Module`到`bytes`的说明文件用于构造`WebAssembly.Module`,然后根据队列中的`importObject`参数作为`WebAssembly.Instance`构造说明实例化`Module`。  在实例化任务运行之后和在下一步的任务进行前,可能会运行其他未指定的异步任务。
 
+当成功重载以后，`Promise`将会被完成并且返回一个包含 `{ module, instance }`的对象，他们分别对应`WebAssembly.Module`和`WebAssembly.Instance`。这两个属性将会根据我们之前初始化的参数决定它是否可配置，可枚举，可编写。
+
+如果重载失败，`Promise`将会根据错误的信息`rejected`一个关于`WebAssembly.CompileError`、`WebAssembly.LinkError`或者`WebAssembly.RuntimeError`的错误。
+
+这个异步编译的逻辑是，当我们使用`compile`时，拷贝一份`BufferSource`状态的副本。随后返回编译完成的`BufferSource`,而且不回影响当前的其他编译任务。
+
+```
+  Promise<WebAssembly.Instance> instantiate(moduleObject [, importObject])
+```
+
+上面的描述适用于实例化的第一个参数是`WebAssembly.Module`的例子。
+
+当这个异步方法根据`moduleObject`和`importObject`的描述去构造`WebAssembly.Instance`的实例。在实例化任务运行之后和在下一步的任务进行前,可能会运行其他未指定的异步任务。
+
+当成功重载以后，`Promise`将会被完成并且返回一个包含 `{ module, instance }`的对象，他们分别对应`WebAssembly.Module`和`WebAssembly.Instance`。如果重载失败，`Promise`将会根据错误的信息`rejected`一个关于`WebAssembly.CompileError`、`WebAssembly.LinkError`或者`WebAssembly.RuntimeError`的错误。
+
+### `WebAssembly.Module` Objects
+
+`WebAssembly.Module`是编译后的二进制模块，并且包含一个内部的slot:
+
+* [[Module]]: 根据我们实例化模块的定义信息
+
+#### 构造`WebAssembly.Module`
+
+`WebAssembly.Module`方法定义:
+
+```
+  new Module(BufferSource bytes)
+```
+
+如果沒有 new 标记是 `undefined`，会抛出一个类型错误警报。
+
+如果参数`bytes`不是`BufferSource`，会抛出一个类型错误警报。
+
+除此之外，这个方法会根据`BufferSource`同步进行编译:
+
+1. 根据[BinaryEncoding.md]()的解码规则对`BufferSource`进行解码，并且验证是否符合[spec/valid.ml]()的规则。
+
+2. 根据[Web.md]()中的描述，在`Ast.module`的Spec字符串会被解码成UTF8的编码格式。
+
+3. 当成功的时候，新的`WebAssembly.Module`对象会被返回，并且被设置成认真的`Ast.module`。
+
+4. 如果失败，则抛出一个编译错误警报。
