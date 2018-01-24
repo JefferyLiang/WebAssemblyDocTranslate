@@ -140,3 +140,102 @@ Promise<WebAssemblyInstantiatedSource>
 3. 当成功的时候，新的`WebAssembly.Module`对象会被返回，并且被设置成认真的`Ast.module`。
 
 4. 如果失败，则抛出一个编译错误警报。
+
+### `WebAssembly.Module.prototype [ @@toStringTag ]` Property
+
+初始化 `@@toStringTag` 原型的值是 `WebAssembly.Module` 的字符串值。
+
+这个原型有以下属性: 
+
+```
+{
+  [[Writable]] : false,
+  [[Enumerable]]: false,
+  [[Configurable]]: true
+}
+```
+
+### `WebAssembly.Module.exports`
+
+`exports`方法描述描述如下:
+
+```
+  Array exports(moduleObject)
+```
+
+如果 `moduleObject` 不是 `WebAssembly.Module`， 会抛出一个类型错误。
+
+每当这个方法被调用时会返回一个 `Array`。这个 `Array` 是根据遍历 `Ast.export`的 `e` 生成的。这个 `e` 是 [moduleObject.[[Module]].exports]()的模型。Object的模型如下:
+
+```
+{
+  name: String(e.name),
+  kind: e.ekind
+}
+```
+
+其中:
+ 
+`e.name` 是 UTF8 的编码格式
+
+`e.kind` 可能是以下的一个字符串值: `function`, `table`, `memory`, `global`。
+
+这个返回的 `Array` 是根据 WebAssembly binary's 暴露出来的 table。
+
+### `WebAssembly.Module.imports`
+
+`imports`方法的描述如下:
+
+```
+  Array imports(moduleObject)
+```
+
+如果 `moduleObject` 不是 `WebAssembly.Module`， 会抛出一个类型错误。
+
+每当这个方法被调用时会返回一个 `Array`。每当这个方法被调用时会返回一个 `Array`。这个 `Array` 是根据遍历 `Ast.import`的 `i` 生成的。这个 `i` 是 [moduleObject.[[Module]].imports]()的模型。Object的模型如下:
+
+```
+{
+  module: String(i.module_nmae),
+  name: String(i.item_name),
+  kind: i.ikind
+}
+```
+
+其中:
+ 
+`e.name` 是 UTF8 的编码格式
+
+`e.kind` 可能是以下的一个字符串值: `function`, `table`, `memory`, `global`。
+
+### `WebAssembly.Module.customSections`
+
+`customSections`方法描述如下:
+
+```
+  Array customSections(moduleObject, sectionName)
+```
+
+如果 `moduleObject` 不是 `WebAssembly.Module`， 会抛出一个类型错误。
+
+Let sectionNameString be the result of ToString(sectionName)。(这句怎么翻译)
+
+每当这个方法被调用时会返回一个 `Array`。根据定义的 `sectionName` 的字符串名字把这一段对应的 `ArrayBuffer` 拷贝到 `payload_data`中。（在`payload_data`不包含 `name` 或者 `name_len`）。
+
+### Structured Clone of a `WebAssembly.Module`
+
+`WebAssembly.Module`是一个可以被拷贝的对象，这意味着可以被拷贝到 [IDBObjectStore]()中。如果是二进制源的化，被克隆的对象的接口将会于被编译的`WebAssembly.Module`一样，能够被克隆到需要使用的地方并且进行编译。
+
+Engines should attempt to share/reuse internal compiled code when performing a structured clone although, in corner cases like CPU upgrade or browser update, this may not be possible and full recompilation may be necessary.
+
+Given the above engine optimizations, structured cloning provides developers explicit control over both compiled-code caching and cross-window/worker code sharing.
+
+### `WebAssembly.Instance` Objects
+
+WebAssembly.Instance对象表示将WebAssembly.Module实例化为一个区域，并具有一个可选参数：
+
+* [[Instance]]: 在WebAssembly种的一个规范化的实例Instance.instance.
+* [[Exports]]: 当它被实例化的时候将会被暴露的对象。
+
+### `WebAssembly.Instance` Constructor
+
